@@ -1,7 +1,13 @@
 import Vue from 'vue'
-import Test from './components/Test';
+import Calendar from './components/Calendar';
+import Card from './components/Card';
 
-Vue.component('test', Test);
+[
+    Calendar,
+    Card
+].forEach(Component => {
+    Vue.component(Component.name, Component)
+})
 
 const app = new Vue({
     el: '#app'
