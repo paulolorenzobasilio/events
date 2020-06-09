@@ -75,6 +75,17 @@ export default {
   created() {
     this.dates = this.getDates(6, 2020);
   },
+  async mounted() {
+    const events = await axios
+      .get("/api/event")
+      .then(response =>
+        response.data.map(
+          data => new Date(new Date(data.date).setHours(0, 0, 0, 0))
+        )
+      );
+
+    this.markEvents(events);
+  },
   methods: {
     getDates(month, year) {
       return new Array(31)
