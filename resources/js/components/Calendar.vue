@@ -37,15 +37,7 @@
         </div>
         <!-- date -->
         <div class="col-md-8">
-          <select class="form-control" @change="changeMonth($event.target.value)">
-            <option
-              v-for="month in range(new Date().getMonth(), 12)"
-              :key="month"
-              :value="month"
-            >{{ `${monthNames[month]} 2020`}}</option>
-          </select>
-          <hr />
-          <calendar-dates :dates="dates" ref="CalendarDates"></calendar-dates>
+          <calendar-dates :dates="dates" ref="CalendarDates" v-on:change-month="changeMonth"></calendar-dates>
         </div>
       </div>
     </card>
@@ -62,20 +54,6 @@ export default {
   name: "Calendar",
   data() {
     return {
-      monthNames: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ],
       dates: [],
       form: {
         event: null,
@@ -93,16 +71,6 @@ export default {
     this.$refs.CalendarDates.markEvents(await this.getEvents());
   },
   methods: {
-    *range(start = 0, end = null, step = 1) {
-      if (end == null) {
-        end = start;
-        start = 0;
-      }
-
-      for (let i = start; i < end; i += step) {
-        yield i;
-      }
-    },
     async getEvents() {
       return await axios
         .get("/api/event")
