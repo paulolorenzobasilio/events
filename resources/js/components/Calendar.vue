@@ -37,16 +37,7 @@
         </div>
         <!-- date -->
         <div class="col-md-8">
-          <h2>Jun 2020</h2>
-          <hr />
-          <ul class="list-group list-group-flush">
-            <li
-              class="list-group-item"
-              v-for="(date, index) in dates"
-              :id="date.id"
-              :key="index"
-            >{{ `${date.date.getDate()} ${getNameOfDay(date.date)}` }}</li>
-          </ul>
+          <calendar-dates :dates="dates" ref="CalendarDates"></calendar-dates>
         </div>
       </div>
     </card>
@@ -57,6 +48,7 @@
 import Card from "./Card";
 import axios from "axios";
 import Swal from "sweetalert2";
+import CalendarDates from "./CalendarDates";
 
 export default {
   name: "Calendar",
@@ -84,7 +76,8 @@ export default {
         )
       );
 
-    this.markEvents(events);
+    this.$refs.CalendarDates.markEvents(events);
+    
   },
   methods: {
     getDates(month, year) {
@@ -142,26 +135,9 @@ export default {
         return localISOTime;
       });
     },
-    markEvents(selectedDates) {
-      selectedDates.forEach(selectedDate => {
-        const date = this.dates.find(
-          date => date.date.getTime() === selectedDate.getTime()
-        );
-        document
-          .getElementById(date.id)
-          .classList.add("list-group-item-success");
-      });
-    },
-    clearEvents() {
-      this.dates.forEach(date =>
-        document
-          .getElementById(date.id)
-          .classList.remove("list-group-item-success")
-      );
-    },
     saveEvent(e) {
       e.preventDefault();
-
+      
       let selectedDates = this.getDateRange(
         this.form.fromDate,
         this.form.toDate
@@ -175,8 +151,8 @@ export default {
           date: this.mapDateData(selectedDates)
         })
         .then(response => {
-          this.clearEvents();
-          this.markEvents(selectedDates);
+          this.$refs.CalendarDates.clearEvents();
+          this.$refs.CalendarDates.markEvents(selectedDates);
           this.notif("Event successfully saved");
         })
         .catch(error => {
