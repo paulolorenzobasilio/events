@@ -7,7 +7,7 @@
           <form @submit="saveEvent">
             <div class="form-group">
               <label>Event</label>
-              <input type="text" class="form-control" v-model="form.event" />
+              <input type="text" class="form-control" v-model="form.event" required />
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
