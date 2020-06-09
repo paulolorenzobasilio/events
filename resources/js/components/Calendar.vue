@@ -171,6 +171,7 @@ export default {
 
       axios
         .post("/api/event", {
+          name: this.form.event,
           date: this.mapDateData(selectedDates)
         })
         .then(response => {

@@ -24,8 +24,9 @@ class EventController extends Controller
         DB::transaction(function () {
             DB::table('events')->delete();
             $date = request()->date;
+            $name = request()->name;
             foreach ($date as $value) {
-                $this->event->create(['date' => $value]);
+                $this->event->create(['name' => $name, 'date' => $value]);
             }
         });
 

@@ -26,6 +26,7 @@ $factory->define(User::class, function (Faker $faker) {
 
 $factory->define(Event::class, function (Faker $faker){
     return [
+        'name' => $faker->word(),
         'date' => $faker->date()
     ];
 });
