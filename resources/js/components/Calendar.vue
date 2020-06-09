@@ -37,6 +37,14 @@
         </div>
         <!-- date -->
         <div class="col-md-8">
+          <select class="form-control" @change="changeMonth($event.target.value)">
+            <option
+              v-for="month in range(new Date().getMonth(), 12)"
+              :key="month"
+              :value="month"
+            >{{ `${monthNames[month]} 2020`}}</option>
+          </select>
+          <hr />
           <calendar-dates :dates="dates" ref="CalendarDates"></calendar-dates>
         </div>
       </div>
@@ -54,6 +62,20 @@ export default {
   name: "Calendar",
   data() {
     return {
+      monthNames: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ],
       dates: [],
       form: {
         event: null,
@@ -68,26 +90,40 @@ export default {
     this.dates = this.getDates(6, 2020);
   },
   async mounted() {
-    const events = await axios
-      .get("/api/event")
-      .then(response =>
-        response.data.map(
-          data => new Date(new Date(data.date).setHours(0, 0, 0, 0))
-        )
-      );
-
-    this.$refs.CalendarDates.markEvents(events);
-    
+    this.$refs.CalendarDates.markEvents(await this.getEvents());
   },
   methods: {
+    *range(start = 0, end = null, step = 1) {
+      if (end == null) {
+        end = start;
+        start = 0;
+      }
+
+      for (let i = start; i < end; i += step) {
+        yield i;
+      }
+    },
+    async getEvents() {
+      return await axios
+        .get("/api/event")
+        .then(response =>
+          response.data.map(
+            data => new Date(new Date(data.date).setHours(0, 0, 0, 0))
+          )
+        );
+    },
+    async changeMonth(month) {
+      this.dates = this.getDates(+month + +1, 2020);
+      this.$refs.CalendarDates.clearEvents();
+      this.$refs.CalendarDates.markEvents(await this.getEvents());
+    },
     getDates(month, year) {
       return new Array(31)
         .fill("")
         .map((v, i) => {
           return {
-            id: `june-${i + 1}`,
-            date: new Date(year, month - 1, i + 1),
-            selected: false
+            id: `day-${i + 1}`,
+            date: new Date(year, month - 1, i + 1)
           };
         })
         .filter(v => v.date.getMonth() === month - 1);
@@ -137,7 +173,7 @@ export default {
     },
     saveEvent(e) {
       e.preventDefault();
-      
+
       let selectedDates = this.getDateRange(
         this.form.fromDate,
         this.form.toDate

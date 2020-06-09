@@ -1,7 +1,5 @@
 <template>
   <div>
-    <h2>Jun 2020</h2>
-    <hr />
     <ul class="list-group list-group-flush">
       <li
         class="list-group-item"
@@ -19,14 +17,13 @@ export default {
   props: ["dates"],
   methods: {
     markEvents(selectedDates) {
-      selectedDates.forEach(selectedDate => {
-        const date = this.dates.find(
-          date => date.date.getTime() === selectedDate.getTime()
-        );
-        document
-          .getElementById(date.id)
-          .classList.add("list-group-item-success");
-      });
+      this.dates.filter(date =>
+        selectedDates.find(
+          selectedDate => date.date.getTime() === selectedDate.getTime()
+        )
+      ).forEach(date => {
+        document.getElementById(date.id).classList.add("list-group-item-success");
+      })
     },
     clearEvents() {
       this.dates.forEach(date =>
