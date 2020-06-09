@@ -55,6 +55,7 @@
 
 <script>
 import Card from "./Card";
+import axios from "axios";
 
 export default {
   name: "Calendar",
@@ -113,6 +114,9 @@ export default {
       );
     },
     saveEvent(e) {
+      /**
+       * TODO: clean this code
+       */
       e.preventDefault();
       this.clearEvents();
 
@@ -122,6 +126,25 @@ export default {
       ).filter(date =>
         this.form.selectedDays.includes(this.getNameOfDay(date))
       );
+
+      const selectedDateRange2 = selectedDateRange.map(date => {
+        const tzoffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
+        const localISOTime = new Date(date - tzoffset)
+          .toISOString()
+          .slice(0, 10);
+        return localISOTime;
+      });
+
+      axios
+        .post("/api/event", {
+          date: selectedDateRange2
+        })
+        .then(function(response) {
+          console.log("success");
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
 
       selectedDateRange.forEach(dateRange => {
         const date = this.dates.find(

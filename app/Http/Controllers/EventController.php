@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Model\Event;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
@@ -13,12 +14,21 @@ class EventController extends Controller
         $this->event = $event;
     }
 
-    public function index(){
+    public function index()
+    {
         return $this->event->all();
     }
 
-    public function store(){
-        $this->event->date = request()->date;
-        $this->event->save();
+    public function store()
+    {
+        /**
+         * TODO: delete events by month
+         */
+        DB::transaction(function () {
+            $date = request()->date;
+            foreach ($date as $value) {
+                $this->event->create(['date' => $value]);
+            }
+        });
     }
 }
