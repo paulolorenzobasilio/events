@@ -56,6 +56,7 @@
 <script>
 import Card from "./Card";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
   name: "Calendar",
@@ -106,6 +107,40 @@ export default {
 
       return dates;
     },
+    notif(title, icon = "success") {
+      Swal.fire({
+        icon: icon,
+        title: title,
+        toast: true,
+        position: "top-right",
+        showConfirmButton: false,
+        timer: 3000
+      });
+    },
+    mapDateData(selectedDates) {
+      /**
+       * Compute the offset because toISOString() converts it to UTC.
+       * There is a chance that the given day will become -1 day when converted to ISO
+       * so we need to compute the offset
+       */
+      return selectedDates.map(date => {
+        const tzoffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
+        const localISOTime = new Date(date - tzoffset)
+          .toISOString()
+          .slice(0, 10);
+        return localISOTime;
+      });
+    },
+    markEvents(selectedDates) {
+      selectedDates.forEach(selectedDate => {
+        const date = this.dates.find(
+          date => date.date.getTime() === selectedDate.getTime()
+        );
+        document
+          .getElementById(date.id)
+          .classList.add("list-group-item-success");
+      });
+    },
     clearEvents() {
       this.dates.forEach(date =>
         document
@@ -114,46 +149,27 @@ export default {
       );
     },
     saveEvent(e) {
-      /**
-       * TODO: clean this code
-       */
       e.preventDefault();
-      this.clearEvents();
 
-      let selectedDateRange = this.getDateRange(
+      let selectedDates = this.getDateRange(
         this.form.fromDate,
         this.form.toDate
       ).filter(date =>
         this.form.selectedDays.includes(this.getNameOfDay(date))
       );
 
-      const selectedDateRange2 = selectedDateRange.map(date => {
-        const tzoffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
-        const localISOTime = new Date(date - tzoffset)
-          .toISOString()
-          .slice(0, 10);
-        return localISOTime;
-      });
-
       axios
         .post("/api/event", {
-          date: selectedDateRange2
+          date: this.mapDateData(selectedDates)
         })
-        .then(function(response) {
-          console.log("success");
+        .then(response => {
+          this.clearEvents();
+          this.markEvents(selectedDates);
+          this.notif("Event successfully saved");
         })
-        .catch(function(error) {
-          console.log(error);
+        .catch(error => {
+          this.notif("Something went wrong", "error");
         });
-
-      selectedDateRange.forEach(dateRange => {
-        const date = this.dates.find(
-          date => date.date.getTime() === dateRange.getTime()
-        );
-        document
-          .getElementById(date.id)
-          .classList.add("list-group-item-success");
-      });
     }
   }
 };

@@ -21,14 +21,14 @@ class EventController extends Controller
 
     public function store()
     {
-        /**
-         * TODO: delete events by month
-         */
         DB::transaction(function () {
+            DB::table('events')->delete();
             $date = request()->date;
             foreach ($date as $value) {
                 $this->event->create(['date' => $value]);
             }
         });
+
+        return response()->json([], 201);
     }
 }
