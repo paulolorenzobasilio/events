@@ -7,7 +7,7 @@
           <form @submit="saveEvent">
             <div class="form-group">
               <label>Event</label>
-              <input type="text" class="form-control" v-model="form.event" />
+              <input type="text" class="form-control" v-model="form.event" required />
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
@@ -37,16 +37,7 @@
         </div>
         <!-- date -->
         <div class="col-md-8">
-          <h2>Jun 2020</h2>
-          <hr />
-          <ul class="list-group list-group-flush">
-            <li
-              class="list-group-item"
-              v-for="(date, index) in dates"
-              :id="date.id"
-              :key="index"
-            >{{ `${date.date.getDate()} ${getNameOfDay(date.date)}` }}</li>
-          </ul>
+          <calendar-dates :dates="dates" ref="CalendarDates" v-on:change-month="changeMonth"></calendar-dates>
         </div>
       </div>
     </card>
@@ -57,6 +48,7 @@
 import Card from "./Card";
 import axios from "axios";
 import Swal from "sweetalert2";
+import CalendarDates from "./CalendarDates";
 
 export default {
   name: "Calendar",
@@ -76,25 +68,30 @@ export default {
     this.dates = this.getDates(6, 2020);
   },
   async mounted() {
-    const events = await axios
-      .get("/api/event")
-      .then(response =>
-        response.data.map(
-          data => new Date(new Date(data.date).setHours(0, 0, 0, 0))
-        )
-      );
-
-    this.markEvents(events);
+    this.$refs.CalendarDates.markEvents(await this.getEvents());
   },
   methods: {
+    async getEvents() {
+      return await axios
+        .get("/api/event")
+        .then(response =>
+          response.data.map(
+            data => new Date(new Date(data.date).setHours(0, 0, 0, 0))
+          )
+        );
+    },
+    async changeMonth(month) {
+      this.dates = this.getDates(+month + +1, 2020);
+      this.$refs.CalendarDates.clearEvents();
+      this.$refs.CalendarDates.markEvents(await this.getEvents());
+    },
     getDates(month, year) {
       return new Array(31)
         .fill("")
         .map((v, i) => {
           return {
-            id: `june-${i + 1}`,
-            date: new Date(year, month - 1, i + 1),
-            selected: false
+            id: `day-${i + 1}`,
+            date: new Date(year, month - 1, i + 1)
           };
         })
         .filter(v => v.date.getMonth() === month - 1);
@@ -142,23 +139,6 @@ export default {
         return localISOTime;
       });
     },
-    markEvents(selectedDates) {
-      selectedDates.forEach(selectedDate => {
-        const date = this.dates.find(
-          date => date.date.getTime() === selectedDate.getTime()
-        );
-        document
-          .getElementById(date.id)
-          .classList.add("list-group-item-success");
-      });
-    },
-    clearEvents() {
-      this.dates.forEach(date =>
-        document
-          .getElementById(date.id)
-          .classList.remove("list-group-item-success")
-      );
-    },
     saveEvent(e) {
       e.preventDefault();
 
@@ -175,8 +155,8 @@ export default {
           date: this.mapDateData(selectedDates)
         })
         .then(response => {
-          this.clearEvents();
-          this.markEvents(selectedDates);
+          this.$refs.CalendarDates.clearEvents();
+          this.$refs.CalendarDates.markEvents(selectedDates);
           this.notif("Event successfully saved");
         })
         .catch(error => {
