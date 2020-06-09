@@ -26,6 +26,6 @@ $factory->define(User::class, function (Faker $faker) {
 
 $factory->define(Event::class, function (Faker $faker){
     return [
-        'event' => $faker->dateTime()
+        'date' => $faker->date()
     ];
 });
