@@ -2,6 +2,7 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
+use App\Model\Event;
 use App\User;
 use Faker\Generator as Faker;
 
@@ -20,5 +21,11 @@ $factory->define(User::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
         'email' => $faker->email,
+    ];
+});
+
+$factory->define(Event::class, function (Faker $faker){
+    return [
+        'event' => $faker->dateTime()
     ];
 });
