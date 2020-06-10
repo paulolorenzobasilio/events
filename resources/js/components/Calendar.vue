@@ -90,12 +90,20 @@ export default {
         return localISOTime;
       });
     },
-    validateDateRange(form){
-      return form.fromDate < form.toDate
+    validateDateRange(fromDate, toDate){
+      return fromDate < toDate
+    },
+    validateIfDaysSelectedIsEmpty(selectedDays){
+      return selectedDays.length === 0;
     },
     async saveEvent(form) {
-      if(!this.validateDateRange(form)){
-        this.$_notif('Invalid date range', 'error');
+      if(!this.validateDateRange(form.fromDate, form.toDate)){
+        this.$_notif('Invalid date range.', 'error');
+        return false;
+      }
+
+      if(this.validateIfDaysSelectedIsEmpty(form.selectedDays)){
+        this.$_notif('Please select days.', 'error');
         return false;
       }
 
