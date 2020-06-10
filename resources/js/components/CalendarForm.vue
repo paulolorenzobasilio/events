@@ -2,7 +2,7 @@
   <form @submit.prevent="saveEvent">
     <div class="form-group">
       <label>Event</label>
-      <input type="text" class="form-control" v-model="form.event" required />
+      <input type="text" class="form-control" v-model="form.event" />
     </div>
     <div class="form-row">
       <div class="form-group col-md-6">
@@ -43,6 +43,14 @@ export default {
   methods: {
       saveEvent(){
           this.$emit('save-event', this.form);
+      },
+      clearForm(){
+        this.form = {
+          event: null,
+          fromDate: null,
+          toDate: null,
+          selectedDays: []
+        }
       }
   }
 };

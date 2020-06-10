@@ -4,7 +4,7 @@
       <div class="row">
         <!-- form -->
         <div class="col-md-4">
-          <calendar-form v-on:save-event="saveEvent"></calendar-form>
+          <calendar-form v-on:save-event="saveEvent" ref="CalendarForm"></calendar-form>
         </div>
         <!-- date -->
         <div class="col-md-8">
@@ -76,7 +76,6 @@ export default {
 
       return dates;
     },
-    
     mapDateData(selectedDates) {
       /**
        * Compute the offset because toISOString() converts it to UTC.
@@ -91,7 +90,15 @@ export default {
         return localISOTime;
       });
     },
-    saveEvent(form) {
+    validateDateRange(form){
+      return form.fromDate < form.toDate
+    },
+    async saveEvent(form) {
+      if(!this.validateDateRange(form)){
+        this.$_notif('Invalid date range', 'error');
+        return false;
+      }
+
       let selectedDates = this.getDateRange(
         form.fromDate,
         form.toDate
@@ -99,7 +106,7 @@ export default {
         form.selectedDays.includes(this.$_getNameOfDay(date))
       );
 
-      axios
+      await axios
         .post("/api/event", {
           name: form.event,
           date: this.mapDateData(selectedDates)
@@ -107,6 +114,7 @@ export default {
         .then(response => {
           this.$refs.CalendarDates.clearEvents();
           this.$refs.CalendarDates.markEvents(selectedDates);
+          this.$refs.CalendarForm.clearForm();
           this.$_notif("Event successfully saved");
         })
         .catch(error => {
