@@ -14,7 +14,7 @@
 4. configure your .env environment
 5. composer install
 6. npm install
-7. php artisan migrate --seed
+7. php artisan migrate
 
 ## Development
 Run `npm run watch` for compiling of assets
