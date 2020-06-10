@@ -6,7 +6,7 @@
 - PHP
 - NPM
 - Composer
-- 
+
 ### Installing
 1. git clone https://github.com/paulolorenzobasilio/events.git
 2. cd into project dir
