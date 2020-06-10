@@ -4,36 +4,7 @@
       <div class="row">
         <!-- form -->
         <div class="col-md-4">
-          <form @submit="saveEvent">
-            <div class="form-group">
-              <label>Event</label>
-              <input type="text" class="form-control" v-model="form.event" required />
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label>From</label>
-                <input type="date" class="form-control" v-model="form.fromDate" />
-              </div>
-              <div class="form-group col-md-6">
-                <label>To</label>
-                <input type="date" class="form-control" v-model="form.toDate" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="col" v-for="(day,index) in days" :key="index">
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    v-model="form.selectedDays"
-                    :value="day"
-                  />
-                  <label class="form-check-label">{{ day }}</label>
-                </div>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Save</button>
-          </form>
+          <calendar-form v-on:save-event="saveEvent"></calendar-form>
         </div>
         <!-- date -->
         <div class="col-md-8">
@@ -49,19 +20,13 @@ import Card from "./Card";
 import axios from "axios";
 import Swal from "sweetalert2";
 import CalendarDates from "./CalendarDates";
+import CalendarForm from './CalendarForm';
 
 export default {
   name: "Calendar",
   data() {
     return {
       dates: [],
-      form: {
-        event: null,
-        fromDate: null,
-        toDate: null,
-        selectedDays: []
-      },
-      days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     };
   },
   created() {
@@ -139,19 +104,17 @@ export default {
         return localISOTime;
       });
     },
-    saveEvent(e) {
-      e.preventDefault();
-
+    saveEvent(form) {
       let selectedDates = this.getDateRange(
-        this.form.fromDate,
-        this.form.toDate
+        form.fromDate,
+        form.toDate
       ).filter(date =>
-        this.form.selectedDays.includes(this.getNameOfDay(date))
+        form.selectedDays.includes(this.getNameOfDay(date))
       );
 
       axios
         .post("/api/event", {
-          name: this.form.event,
+          name: form.event,
           date: this.mapDateData(selectedDates)
         })
         .then(response => {
