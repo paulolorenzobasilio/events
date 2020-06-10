@@ -18,5 +18,6 @@
 
 ## Development
 Run `npm run watch` for compiling of assets
+
 Run `php -S localhost:8000 -t public` for the server
 
