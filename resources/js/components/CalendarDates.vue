@@ -14,7 +14,7 @@
         v-for="(date, index) in dates"
         :id="date.id"
         :key="index"
-      >{{ `${date.date.getDate()} ${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date.date)}` }}</li>
+      >{{ `${date.date.getDate()} ${$_getNameOfDay(date.date)}` }}</li>
     </ul>
   </div>
 </template>

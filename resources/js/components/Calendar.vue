@@ -18,7 +18,6 @@
 <script>
 import Card from "./Card";
 import axios from "axios";
-import Swal from "sweetalert2";
 import CalendarDates from "./CalendarDates";
 import CalendarForm from './CalendarForm';
 
@@ -61,9 +60,6 @@ export default {
         })
         .filter(v => v.date.getMonth() === month - 1);
     },
-    getNameOfDay(day) {
-      return new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(day);
-    },
     getDateRange(start, end) {
       let dates = [];
       const endDate = new Date(end);
@@ -80,16 +76,7 @@ export default {
 
       return dates;
     },
-    notif(title, icon = "success") {
-      Swal.fire({
-        icon: icon,
-        title: title,
-        toast: true,
-        position: "top-right",
-        showConfirmButton: false,
-        timer: 3000
-      });
-    },
+    
     mapDateData(selectedDates) {
       /**
        * Compute the offset because toISOString() converts it to UTC.
@@ -109,7 +96,7 @@ export default {
         form.fromDate,
         form.toDate
       ).filter(date =>
-        form.selectedDays.includes(this.getNameOfDay(date))
+        form.selectedDays.includes(this.$_getNameOfDay(date))
       );
 
       axios
@@ -120,10 +107,10 @@ export default {
         .then(response => {
           this.$refs.CalendarDates.clearEvents();
           this.$refs.CalendarDates.markEvents(selectedDates);
-          this.notif("Event successfully saved");
+          this.$_notif("Event successfully saved");
         })
         .catch(error => {
-          this.notif("Something went wrong", "error");
+          this.$_notif("Something went wrong", "error");
         });
     }
   }
